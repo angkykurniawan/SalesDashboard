@@ -189,9 +189,12 @@ async function login(username, password) {
   if (matched) {
     _resetLockout();
     // [FIX-5] Token carries a random nonce — not just a username JSON
+    // R7 — Include role in session: "admin" username gets admin role
     const nonce = crypto.randomUUID();
+    const role  = user.username === "admin" ? "admin" : (user.role || "viewer");
     sessionStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify({
       username: user.username,
+      role,
       nonce,
     }));
     return { ok: true, message: "Login successful." };
@@ -220,7 +223,7 @@ function getSession() {
     const parsed = JSON.parse(raw);
     // Minimal structure validation
     if (typeof parsed.username !== "string" || typeof parsed.nonce !== "string") return null;
-    return { username: parsed.username };
+    return { username: parsed.username, role: parsed.role || "viewer" };
   } catch {
     return null;
   }
@@ -376,6 +379,13 @@ function _startLockoutCountdown(btnEl) {
    FORM HANDLERS  [FIX-8] All listeners attached here, no onclick= in HTML
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
+
+  // Only run login-page logic when we ARE on login.html
+  // Prevents infinite redirect loop when auth.js is also loaded by index.html
+  const onLoginPage = window.location.pathname.endsWith("login.html") ||
+                      window.location.pathname === "/" ||
+                      window.location.pathname.endsWith("/");
+  if (!onLoginPage) return;
 
   // If already logged in, go straight to dashboard
   if (isLoggedIn()) {
