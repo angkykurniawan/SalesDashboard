@@ -1,0 +1,7 @@
+// Auto-generated from users.json
+// Passwords are stored as SHA-256 hashes — never in plaintext.
+// Original credentials: admin / admin123 | analyst / data2023
+const DEFAULT_USERS = [
+  { "username": "admin",   "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9" },
+  { "username": "analyst", "password_hash": "845eb977b88a3952876adcd97a1d0495650f5f2c7bdda57d9f21d18008d96eb4" }
+];
